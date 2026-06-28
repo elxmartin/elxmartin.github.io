@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Nuke Dashboard</title>
+  <style>
+    body{margin:0;font-family:system-ui;background:#070b14;color:#e7eefc}
+    header{padding:18px 24px;background:#0d1424;border-bottom:1px solid #1f2a44}
+    h1{margin:0;font-size:22px}
+    main{padding:20px;display:grid;gap:18px}
+    .card{background:#0d1424;border:1px solid #1f2a44;border-radius:14px;padding:16px}
+    input,textarea,button,select{
+      width:100%;box-sizing:border-box;border-radius:10px;border:1px solid #2b3b60;
+      background:#08101f;color:#e7eefc;padding:10px;margin-top:8px
+    }
+    textarea{min-height:120px;font-family:monospace}
+    button{cursor:pointer;background:#1b4dff;border:0;font-weight:700}
+    button.danger{background:#b42318}
+    button.gray{background:#263248}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+    pre{white-space:pre-wrap;background:#050914;padding:12px;border-radius:10px;overflow:auto}
+    table{width:100%;border-collapse:collapse}
+    th,td{border-bottom:1px solid #1f2a44;padding:8px;text-align:left;font-size:14px}
+    .small{font-size:12px;color:#9fb0d0}
+  </style>
+</head>
+<body>
+<header>
+  <h1>Nuke Targeted Nuclei Dashboard</h1>
+  <div class="small">Tech sort → template-based nuclei → logs/results</div>
+</header>
+
+<main>
+  <div class="grid">
+    <section class="card">
+      <h2>API Settings</h2>
+      <label>Cloudflare Worker URL</label>
+      <input id="apiUrl" placeholder="https://nuke.locamartin.workers.dev/" />
+      <label>API Secret</label>
+      <input id="apiKey" type="password" placeholder="Bearer secret" />
+      <button onclick="saveSettings()">Save Settings</button>
+    </section>
+
+    <section class="card">
+      <h2>Start Scan</h2>
+      <textarea id="domains" placeholder="https://grafana.example.com&#10;https://jenkins.example.com"></textarea>
+      <button onclick="startScan()">Run Targeted Scan</button>
+      <input type="file" id="fileInput" />
+      <button class="gray" onclick="importFile()">Import File</button>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Latest Summary</h2>
+    <button class="gray" onclick="loadSummary()">Refresh Summary</button>
+    <pre id="summaryBox">No summary loaded.</pre>
+  </section>
+
+  <section class="card">
+    <h2>Scans</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Tech</th>
+          <th>Input</th>
+          <th>Result</th>
+          <th>Log</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="scanTable"></tbody>
+    </table>
+  </section>
+
+  <section class="card">
+    <h2>Log / Result Viewer</h2>
+    <input id="filePath" placeholder="log/nginx-xxxx.log or results/nginx-xxxx.jsonl" />
+    <button class="gray" onclick="loadFile()">View File</button>
+    <button class="danger" onclick="deleteFile()">Delete File via API</button>
+    <pre id="fileBox">No file loaded.</pre>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+
+window.onload = () => {
+  $("apiUrl").value = localStorage.getItem("NUKE_API_URL") || "";
+  $("apiKey").value = localStorage.getItem("NUKE_API_KEY") || "";
+  loadSummary();
+};
+
+function saveSettings(){
+  localStorage.setItem("NUKE_API_URL", $("apiUrl").value.trim());
+  localStorage.setItem("NUKE_API_KEY", $("apiKey").value.trim());
+  alert("Saved");
+}
+
+async function api(path, options = {}){
+  const base = $("apiUrl").value.trim().replace(/\/$/, "");
+  const key = $("apiKey").value.trim();
+
+  const res = await fetch(base + path, {
+    ...options,
+    headers: {
+      "Authorization": "Bearer " + key,
+      ...(options.headers || {})
+    }
+  });
+
+  const text = await res.text();
+  try { return JSON.parse(text); } catch { return text; }
+}
+
+async function startScan(){
+  const domains = $("domains").value.trim();
+  if(!domains) return alert("Add domains first");
+
+  const out = await api("/scan", {
+    method: "POST",
+    body: domains
+  });
+
+  alert(JSON.stringify(out, null, 2));
+}
+
+function importFile(){
+  const f = $("fileInput").files[0];
+  if(!f) return alert("Choose file first");
+
+  const reader = new FileReader();
+  reader.onload = () => $("domains").value = reader.result;
+  reader.readAsText(f);
+}
+
+async function loadSummary(){
+  try {
+    const res = await fetch("../results/latest-summary.json?cache=" + Date.now());
+    const data = await res.json();
+
+    $("summaryBox").textContent = JSON.stringify(data, null, 2);
+
+    const rows = data.scans || [];
+    $("scanTable").innerHTML = rows.map(r => `
+      <tr>
+        <td>${esc(r.tech)}</td>
+        <td>${esc(r.input)}</td>
+        <td><a href="../${esc(r.result)}" target="_blank">${esc(r.result)}</a></td>
+        <td><a href="../${esc(r.log)}" target="_blank">${esc(r.log)}</a></td>
+        <td>${r.exit_code === 0 ? "OK" : "ERR " + r.exit_code}</td>
+      </tr>
+    `).join("");
+  } catch(e) {
+    $("summaryBox").textContent = "No results/latest-summary.json found yet.";
+  }
+}
+
+async function loadFile(){
+  const path = $("filePath").value.trim();
+  if(!path) return alert("Enter file path");
+
+  try {
+    const res = await fetch("../" + path + "?cache=" + Date.now());
+    $("fileBox").textContent = await res.text();
+  } catch(e) {
+    $("fileBox").textContent = "Could not load file.";
+  }
+}
+
+async function deleteFile(){
+  const path = $("filePath").value.trim();
+  if(!path) return alert("Enter file path");
+
+  if(!confirm("Delete " + path + "?")) return;
+
+  const out = await api("/delete", {
+    method: "POST",
+    body: JSON.stringify({ path }),
+    headers: { "Content-Type": "application/json" }
+  });
+
+  alert(JSON.stringify(out, null, 2));
+}
+
+function esc(s){
+  return String(s || "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;");
+}
+</script>
+</body>
+</html>

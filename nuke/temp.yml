@@ -1,0 +1,39 @@
+tech:
+  nginx:
+    input: subtech/nginx.txt
+    templates:
+      - file/audit/nginx/file-missing-nginx-bof-protection.yaml
+      - file/audit/nginx/file-nginx-rate-limiting.yaml
+      - file/audit/nginx/file-nginx-hsts-missing.yaml
+      - file/audit/nginx/file-disable-nginx-server-tokens.yaml
+      - file/audit/nginx/file-missing-nginx-xss-protection.yaml
+      - http/vulnerabilities/other/nginx-webui-rce.yaml
+      - http/vulnerabilities/other/nginxwebui-runcmd-rce.yaml
+      - http/vulnerabilities/other/nginx-merge-slashes-path-traversal.yaml
+      - http/vulnerabilities/other/nginx-module-vts-xss.yaml
+      - http/exposures/logs/nginx-shards.yaml
+      - http/exposures/configs/git-config-nginxoffbyslash.yaml
+      - http/exposures/configs/nginx-config.yaml
+      - http/technologies/eol/nginx-eol.yaml
+      - http/technologies/cloudflare-nginx-detect.yaml
+      - http/technologies/nginx/default-nginx-page.yaml
+      - http/technologies/nginx/nginx-linux-page.yaml
+      - http/technologies/nginx/nginx-version.yaml
+      - http/technologies/nginx-opencloudos-test-page.yaml
+      - http/misconfiguration/ingress-nginx-valid-admission.yaml
+      - http/misconfiguration/installer/nginx-auto-installer.yaml
+      - http/misconfiguration/nginx/nginx-vhost-traffic-status.yaml
+      - http/misconfiguration/nginx/nginx-status-403-bypass.yaml
+      - http/misconfiguration/nginx/nginx-api-traversal.yaml
+      - http/misconfiguration/nginx/nginx-status.yaml
+      - http/misconfiguration/unauthenticated-nginx-dashboard.yaml
+      - http/exposed-panels/nginx-proxy-manager.yaml
+      - http/exposed-panels/nginx-ui-dashboard.yaml
+      - http/exposed-panels/nginx-admin-panel.yaml
+      - http/default-logins/nginx/nginx-proxy-manager-default-login.yaml
+
+  grafana:
+    input: subtech/grafana.txt
+    templates:
+      - http/exposed-panels/grafana-detect.yaml
+      - http/vulnerabilities/grafana/

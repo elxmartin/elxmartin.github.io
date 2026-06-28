@@ -1,0 +1,111 @@
+name: Nuke Targeted Scan
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        required: true
+      domains:
+        required: false
+      path:
+        required: false
+      content:
+        required: false
+
+permissions:
+  contents: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install scan tools
+        if: github.event.inputs.action == 'scan' || github.event.inputs.action == 'import' || github.event.inputs.action == 'rerun'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ripgrep
+          pip install pyyaml
+          go install github.com/projectdiscovery/nuclei/v3/cmd/nuclei@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+
+      - name: Update nuclei templates
+        if: github.event.inputs.action == 'scan' || github.event.inputs.action == 'import' || github.event.inputs.action == 'rerun'
+        run: nuclei -update-templates
+
+      - name: Prepare domains
+        if: github.event.inputs.action == 'scan' || github.event.inputs.action == 'import'
+        run: |
+          cd nuke
+          cat > all.txt <<'EOF'
+          ${{ github.event.inputs.domains }}
+          EOF
+          sed -i 's/^[[:space:]]*//' all.txt
+          sed -i '/^$/d' all.txt
+
+      - name: Prepare rerun domains
+        if: github.event.inputs.action == 'rerun'
+        run: |
+          cd nuke
+          cp last-domains.txt all.txt
+
+      - name: Save last domains
+        if: github.event.inputs.action == 'scan' || github.event.inputs.action == 'import'
+        run: |
+          cd nuke
+          cp all.txt last-domains.txt
+
+      - name: Sort by tech indicator
+        if: github.event.inputs.action == 'scan' || github.event.inputs.action == 'import' || github.event.inputs.action == 'rerun'
+        run: |
+          cd nuke
+          chmod +x sort.sh
+          ./sort.sh all.txt patterns.tsv
+
+      - name: Run targeted engine
+        if: github.event.inputs.action == 'scan' || github.event.inputs.action == 'import' || github.event.inputs.action == 'rerun'
+        run: |
+          cd nuke
+          python3 run-engine.py
+
+      - name: Delete file
+        if: github.event.inputs.action == 'delete'
+        run: |
+          path="${{ github.event.inputs.path }}"
+
+          case "$path" in
+            nuke/log/*|nuke/results/*)
+              rm -f "$path"
+              ;;
+            *)
+              echo "Blocked unsafe delete path: $path"
+              exit 1
+              ;;
+          esac
+
+      - name: Edit file
+        if: github.event.inputs.action == 'edit'
+        run: |
+          path="${{ github.event.inputs.path }}"
+
+          case "$path" in
+            nuke/log/*|nuke/results/*|nuke/note.txt)
+              cat > "$path" <<'EOF'
+          ${{ github.event.inputs.content }}
+          EOF
+              ;;
+            *)
+              echo "Blocked unsafe edit path: $path"
+              exit 1
+              ;;
+          esac
+
+      - name: Commit changes
+        run: |
+          git config user.name "nuke-bot"
+          git config user.email "nuke-bot@users.noreply.github.com"
+          git add nuke/results nuke/log nuke/dashboard nuke/last-domains.txt nuke/note.txt || true
+          git commit -m "nuke: ${{ github.event.inputs.action }}" || echo "No changes"
+          git push

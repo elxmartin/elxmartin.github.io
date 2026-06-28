@@ -1,0 +1,54 @@
+# Nuke Project Plan
+
+Nuke is a targeted nuclei automation system.
+
+The goal is to sort domains/subdomains based on technology indicators in their hostnames, then run only selected nuclei templates for that detected technology instead of running random or broad tag-based scans.
+
+## Core Flow
+
+Domains input  
+→ sort by tech indicator using `patterns.tsv`  
+→ create `subtech/*.txt` files  
+→ `run-engine.py` parses `temp.yml`  
+→ assigns exact nuclei templates to each tech  
+→ runs targeted nuclei scans  
+→ saves results in `nuke/results/`  
+→ saves logs in `nuke/log/`  
+→ dashboard displays output from GitHub Pages
+
+## Main Design Rules
+
+- Use exact templates with `-t`, not `-tags`.
+- Templates are controlled from `temp.yml`.
+- No need to edit engine code when changing scan logic.
+- `run-engine.py` should be reusable by other workflows later.
+- GitHub Actions handles the scan execution.
+- GitHub Pages is only the frontend/dashboard.
+- Cloudflare Worker is the API backend.
+- CLI tool `nuke` sends domains from terminal/stdin to the Worker API.
+
+## Dashboard Features
+
+- View latest scan summary.
+- View logs.
+- View result files.
+- Run single-domain scan.
+- Import domain file.
+- Delete logs/results through API.
+- Edit allowed metadata or notes.
+- Rerun previous scan.
+
+## API Flow
+
+Local terminal / dashboard  
+→ Cloudflare Worker API  
+→ GitHub `workflow_dispatch`  
+→ GitHub Actions scan  
+→ commit logs/results  
+→ GitHub Pages dashboard reads updated JSON/logs
+
+## CLI Usage
+
+```bash
+nuke -d google.com
+```
