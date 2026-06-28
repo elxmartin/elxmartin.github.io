@@ -50,6 +50,9 @@ Local terminal / dashboard
 ## CLI Usage
 
 ```bash
+go install github.com/elxmartin/elxmartin.github.io/nuke/cmd/nuke@latest
+```
+```bash
 curl -s "https://bbscope.com/api/v1/targets/wildcards?platform=ywh&type=bbp" | nuke
 ```
 ```bash
