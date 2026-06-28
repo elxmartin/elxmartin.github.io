@@ -1,0 +1,13 @@
+nuke/nuke
+nuke/cmd/nuke/nuke
+
+nuke/results/*
+nuke/log/*
+
+!nuke/results/.gitkeep
+!nuke/log/.gitkeep
+
+*.exe
+*.out
+*.test
+coverage.out
