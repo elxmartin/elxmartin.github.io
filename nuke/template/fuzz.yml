@@ -1,0 +1,11 @@
+genric-fuzz:
+  input:
+   templates:
+      - http/exposures/configs/config-json-exposure-fuzz.yaml
+      - http/exposures/files/generic-db.yaml
+      - http/exposures/backups/generic-php-files.yaml
+      - dast/vulnerabilities/lfi/windows-lfi-fuzz.yaml
+      - dast/vulnerabilities/xxe/generic-xxe.yaml
+      - http/vulnerabilities/generic
+      - http/exposures/tokens/generic
+      - http/fuzzing

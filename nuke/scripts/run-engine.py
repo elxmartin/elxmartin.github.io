@@ -7,7 +7,7 @@ LOGS = BASE / "log"
 RESULTS.mkdir(exist_ok=True)
 LOGS.mkdir(exist_ok=True)
 
-with open("temp.yml", "r") as f:
+with open("template/domain-tech.yml.", "r") as f:
     config = yaml.safe_load(f)
 
 run_id = datetime.datetime.now().strftime("%Y%m%d-%H%M%S")

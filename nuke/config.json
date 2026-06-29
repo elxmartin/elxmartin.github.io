@@ -1,0 +1,4 @@
+{
+  "worker_url": "https://nuke.locamartin.workers.dev",
+  "api_mode": "worker"
+}

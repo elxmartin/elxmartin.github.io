@@ -1,195 +1,173 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Nuke Dashboard</title>
-  <style>
-    body{margin:0;font-family:system-ui;background:#070b14;color:#e7eefc}
-    header{padding:18px 24px;background:#0d1424;border-bottom:1px solid #1f2a44}
-    h1{margin:0;font-size:22px}
-    main{padding:20px;display:grid;gap:18px}
-    .card{background:#0d1424;border:1px solid #1f2a44;border-radius:14px;padding:16px}
-    input,textarea,button,select{
-      width:100%;box-sizing:border-box;border-radius:10px;border:1px solid #2b3b60;
-      background:#08101f;color:#e7eefc;padding:10px;margin-top:8px
-    }
-    textarea{min-height:120px;font-family:monospace}
-    button{cursor:pointer;background:#1b4dff;border:0;font-weight:700}
-    button.danger{background:#b42318}
-    button.gray{background:#263248}
-    .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-    pre{white-space:pre-wrap;background:#050914;padding:12px;border-radius:10px;overflow:auto}
-    table{width:100%;border-collapse:collapse}
-    th,td{border-bottom:1px solid #1f2a44;padding:8px;text-align:left;font-size:14px}
-    .small{font-size:12px;color:#9fb0d0}
-  </style>
-</head>
-<body>
-<header>
-  <h1>Nuke Targeted Nuclei Dashboard</h1>
-  <div class="small">Tech sort → template-based nuclei → logs/results</div>
-</header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <link rel="stylesheet" href="res/css/nukedashboard.css" />
 
-<main>
-  <div class="grid">
-    <section class="card">
-      <h2>API Settings</h2>
-      <label>Cloudflare Worker URL</label>
-      <input id="apiUrl" placeholder="https://nuke.locamartin.workers.dev/" />
-      <label>API Secret</label>
-      <input id="apiKey" type="password" placeholder="Bearer secret" />
-      <button onclick="saveSettings()">Save Settings</button>
-    </section>
+    <title>Nuke</title>
+  </head>
 
-    <section class="card">
-      <h2>Start Scan</h2>
-      <textarea id="domains" placeholder="https://grafana.example.com&#10;https://jenkins.example.com"></textarea>
-      <button onclick="startScan()">Run Targeted Scan</button>
-      <input type="file" id="fileInput" />
-      <button class="gray" onclick="importFile()">Import File</button>
-    </section>
-  </div>
+  <body>
+    <header>
+  <div class="brand">
+    <div class="logo">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 2626 2401">
+          <path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 631.542969 16.339844 C 504.042969 94.160156 397.863281 183.851562 307.261719 290.429688 C 117.652344 512.828125 12.085938 783.898438 2.042969 1074.679688 L 0.609375 1114.898438 L 919.542969 1114.898438 L 919.542969 1105.851562 C 919.542969 1058.800781 937.785156 987.808594 961.769531 941.960938 C 994.566406 879.019531 1047.25 821.910156 1104.230469 787.929688 L 1116.53125 780.691406 L 1109.769531 769.019531 C 1069.589844 699.648438 657.984375 1.058594 657.167969 1.058594 C 656.550781 1.261719 645.070312 7.890625 631.542969 16.339844 Z M 631.542969 16.339844 " />
+          <path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 1955.519531 22.570312 C 1948.761719 34.441406 1846.269531 208.980469 1727.578125 410.480469 C 1608.898438 612.171875 1511.730469 777.871094 1511.53125 778.871094 C 1511.121094 779.878906 1520.339844 786.921875 1531.820312 794.359375 C 1609.308594 845.640625 1665.46875 921.25 1691.300781 1009.328125 C 1698.269531 1033.058594 1704.011719 1066.839844 1705.859375 1093.589844 L 1707.289062 1114.898438 L 2625.609375 1114.898438 L 2624.171875 1074.679688 C 2610.230469 675.320312 2414.679688 313.148438 2084.871094 75.460938 C 2054.730469 53.738281 1971.71875 0.449219 1968.441406 0.859375 C 1968.230469 0.859375 1962.488281 10.710938 1955.519531 22.570312 Z M 1955.519531 22.570312 " />
+          <path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 1274.160156 860.320312 C 1177.820312 877.410156 1105.261719 933.921875 1070.199219 1019.179688 C 1037.609375 1099.011719 1047.25 1185.890625 1096.851562 1259.890625 C 1109.769531 1278.988281 1145.839844 1314.378906 1165.519531 1327.050781 C 1211.441406 1356.808594 1258.171875 1370.890625 1312.078125 1370.890625 C 1345.910156 1371.089844 1359.230469 1369.078125 1389.980469 1360.03125 C 1432.410156 1347.160156 1465.210938 1327.648438 1497.800781 1295.878906 C 1527.320312 1267.121094 1546.171875 1237.96875 1560.109375 1199.761719 C 1608.691406 1066.230469 1535.308594 917.628906 1398.179688 871.980469 C 1388.128906 868.558594 1372.761719 864.339844 1364.359375 862.53125 C 1343.441406 858.109375 1293.839844 856.898438 1274.160156 860.320312 Z M 1274.160156 860.320312 " />
+          <path fill-rule="nonzero" fill="currentColor" fill-opacity="1" d="M 1115.511719 1450.519531 C 1113.25 1454.542969 801.882812 1983.8125 737.722656 2092.804688 C 695.496094 2164.394531 660.652344 2224.320312 660.035156 2225.726562 C 658.601562 2229.144531 675.613281 2239.199219 723.785156 2263.128906 C 873.628906 2337.535156 1025.929688 2380.367188 1200.570312 2397.257812 C 1251.609375 2402.082031 1373.578125 2402.082031 1425.640625 2397.058594 C 1598.859375 2380.769531 1752.390625 2337.535156 1902.429688 2263.128906 C 1950.601562 2239.199219 1967.621094 2229.144531 1966.179688 2225.726562 C 1965.359375 2223.515625 1566.671875 1544.832031 1521.78125 1469.222656 L 1509.480469 1448.511719 L 1498.621094 1454.542969 C 1481.808594 1463.992188 1447.171875 1477.871094 1424.210938 1484.503906 C 1388.339844 1495.164062 1355.75 1499.585938 1315.160156 1499.789062 C 1249.558594 1499.988281 1194.628906 1487.722656 1138.058594 1459.769531 C 1126.160156 1453.9375 1115.910156 1449.714844 1115.511719 1450.519531 Z M 1115.511719 1450.519531 " />
+        </svg>
+             <h1>Nuke</h1>
+      </div>
+      <div class="tabs">
+        <button class="tab active" onclick="showTab('scan', this)">Scan</button>
+        <button class="tab" onclick="showTab('history', this)">History</button>
+        <button class="tab" onclick="showTab('results', this)">Results</button>
+        <button class="tab" onclick="showTab('logs', this)">Logs</button>
+      </div>
+    </header>
 
-  <section class="card">
-    <h2>Latest Summary</h2>
-    <button class="gray" onclick="loadSummary()">Refresh Summary</button>
-    <pre id="summaryBox">No summary loaded.</pre>
-  </section>
+    <main>
+      <section id="tab-scan">
+        <div class="grid">
+          <section class="card">
+            <h2>New Scan</h2>
+            <textarea
+              id="domains"
+              placeholder="https://grafana.example.com&#10;https://jenkins.example.com"
+            ></textarea>
+            <div class="row" style="margin-top: 10px">
+              <button onclick="startScan()">Start Scan</button>
+              <input type="file" id="fileInput" />
+              <button class="gray" onclick="importFile()">
+                Import Domains
+              </button>
+            </div>
+            <p class="muted">
+              Dashboard uses <code>/nuke/config.json</code> for Worker URL and
+              API mode.
+            </p>
+          </section>
 
-  <section class="card">
-    <h2>Scans</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Tech</th>
-          <th>Input</th>
-          <th>Result</th>
-          <th>Log</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="scanTable"></tbody>
-    </table>
-  </section>
+          <section class="card">
+            <h2>Latest Scan</h2>
+            <div class="stats">
+              <div class="stat">
+                <div class="label">Status</div>
+                <div class="value" id="statStatus">-</div>
+              </div>
+              <div class="stat">
+                <div class="label">Run ID</div>
+                <div class="value" id="statRun">-</div>
+              </div>
+              <div class="stat">
+                <div class="label">Techs</div>
+                <div class="value" id="statTechs">0</div>
+              </div>
+              <div class="stat">
+                <div class="label">Templates</div>
+                <div class="value" id="statTemplates">0</div>
+              </div>
+              <div class="stat">
+                <div class="label">Findings</div>
+                <div class="value" id="statFindings">0</div>
+              </div>
+            </div>
+            <div class="row" style="margin-top: 14px">
+              <button class="gray" onclick="loadAll()">Refresh</button>
+              <button class="gray" onclick="rerun()">Rerun</button>
+            </div>
+            <p class="muted" id="latestTime">No scan loaded.</p>
+          </section>
+        </div>
 
-  <section class="card">
-    <h2>Log / Result Viewer</h2>
-    <input id="filePath" placeholder="log/nginx-xxxx.log or results/nginx-xxxx.jsonl" />
-    <button class="gray" onclick="loadFile()">View File</button>
-    <button class="danger" onclick="deleteFile()">Delete File via API</button>
-    <pre id="fileBox">No file loaded.</pre>
-  </section>
-</main>
+        <section class="card" style="margin-top: 18px">
+          <h2>Scan Breakdown</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Tech</th>
+                <th>Input</th>
+                <th>Templates</th>
+                <th>Result</th>
+                <th>Log</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="scanTable"></tbody>
+          </table>
+        </section>
+      </section>
 
-<script>
-const $ = id => document.getElementById(id);
+      <section id="tab-history" class="hidden">
+        <section class="card">
+          <div class="viewer-head">
+            <h2>History</h2>
+            <button class="gray inline" onclick="loadAll()">Refresh</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Run</th>
+                <th>Started</th>
+                <th>Finished</th>
+                <th>Techs</th>
+                <th>Files</th>
+              </tr>
+            </thead>
+            <tbody id="historyTable"></tbody>
+          </table>
+        </section>
+      </section>
 
-window.onload = () => {
-  $("apiUrl").value = localStorage.getItem("NUKE_API_URL") || "";
-  $("apiKey").value = localStorage.getItem("NUKE_API_KEY") || "";
-  loadSummary();
-};
+      <section id="tab-results" class="hidden">
+        <section class="card">
+          <div class="viewer-head">
+            <h2>Results</h2>
+            <button class="gray inline" onclick="loadAll()">Refresh</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Size</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="resultsTable"></tbody>
+          </table>
+        </section>
+      </section>
 
-function saveSettings(){
-  localStorage.setItem("NUKE_API_URL", $("apiUrl").value.trim());
-  localStorage.setItem("NUKE_API_KEY", $("apiKey").value.trim());
-  alert("Saved");
-}
+      <section id="tab-logs" class="hidden">
+        <section class="card">
+          <div class="viewer-head">
+            <h2>Logs</h2>
+            <button class="gray inline" onclick="loadAll()">Refresh</button>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Size</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="logsTable"></tbody>
+          </table>
+        </section>
+      </section>
 
-async function api(path, options = {}){
-  const base = $("apiUrl").value.trim().replace(/\/$/, "");
-  const key = $("apiKey").value.trim();
+      <section class="card">
+        <div class="viewer-head">
+          <h2 id="viewerTitle">Viewer</h2>
+          <button class="gray inline" onclick="clearViewer()">Clear</button>
+        </div>
+        <pre id="viewer">Select a log or result file.</pre>
+      </section>
+    </main>
 
-  const res = await fetch(base + path, {
-    ...options,
-    headers: {
-      "Authorization": "Bearer " + key,
-      ...(options.headers || {})
-    }
-  });
-
-  const text = await res.text();
-  try { return JSON.parse(text); } catch { return text; }
-}
-
-async function startScan(){
-  const domains = $("domains").value.trim();
-  if(!domains) return alert("Add domains first");
-
-  const out = await api("/scan", {
-    method: "POST",
-    body: domains
-  });
-
-  alert(JSON.stringify(out, null, 2));
-}
-
-function importFile(){
-  const f = $("fileInput").files[0];
-  if(!f) return alert("Choose file first");
-
-  const reader = new FileReader();
-  reader.onload = () => $("domains").value = reader.result;
-  reader.readAsText(f);
-}
-
-async function loadSummary(){
-  try {
-    const res = await fetch("../results/latest-summary.json?cache=" + Date.now());
-    const data = await res.json();
-
-    $("summaryBox").textContent = JSON.stringify(data, null, 2);
-
-    const rows = data.scans || [];
-    $("scanTable").innerHTML = rows.map(r => `
-      <tr>
-        <td>${esc(r.tech)}</td>
-        <td>${esc(r.input)}</td>
-        <td><a href="../${esc(r.result)}" target="_blank">${esc(r.result)}</a></td>
-        <td><a href="../${esc(r.log)}" target="_blank">${esc(r.log)}</a></td>
-        <td>${r.exit_code === 0 ? "OK" : "ERR " + r.exit_code}</td>
-      </tr>
-    `).join("");
-  } catch(e) {
-    $("summaryBox").textContent = "No results/latest-summary.json found yet.";
-  }
-}
-
-async function loadFile(){
-  const path = $("filePath").value.trim();
-  if(!path) return alert("Enter file path");
-
-  try {
-    const res = await fetch("../" + path + "?cache=" + Date.now());
-    $("fileBox").textContent = await res.text();
-  } catch(e) {
-    $("fileBox").textContent = "Could not load file.";
-  }
-}
-
-async function deleteFile(){
-  const path = $("filePath").value.trim();
-  if(!path) return alert("Enter file path");
-
-  if(!confirm("Delete " + path + "?")) return;
-
-  const out = await api("/delete", {
-    method: "POST",
-    body: JSON.stringify({ path }),
-    headers: { "Content-Type": "application/json" }
-  });
-
-  alert(JSON.stringify(out, null, 2));
-}
-
-function esc(s){
-  return String(s || "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;");
-}
-</script>
-</body>
+    <script src="res/js/nukedashboard.js"></script>
+  </body>
 </html>
